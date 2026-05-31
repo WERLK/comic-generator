@@ -214,6 +214,133 @@ pip install edge-tts
 | GET | /api/video/status/:jobId | 查询视频状态 |
 | GET | /api/video/download/:jobId | 下载视频 |
 
+## 📱 多平台部署
+
+本项目支持构建为 **PC 桌面应用**、**Android 应用** 和 **iOS 应用**。
+
+### 🖥️ PC 端 (Windows / macOS / Linux)
+
+使用 **Electron** 构建桌面应用：
+
+```bash
+cd frontend
+
+# 安装 Electron 依赖
+npm install -D electron electron-builder
+
+# 开发模式运行
+npm run electron:dev
+
+# 构建生产版本
+npm run electron:build
+
+# 单独构建各平台
+npm run electron:build:win    # Windows
+npm run electron:build:mac    # macOS
+npm run electron:build:linux  # Linux
+```
+
+构建输出：
+- Windows: `dist-electron/漫剧生成器 Setup.exe`
+- macOS: `dist-electron/漫剧生成器.dmg`
+- Linux: `dist-electron/漫剧生成器.AppImage`
+
+### 📱 Android 端
+
+使用 **Capacitor** 构建 Android 应用：
+
+```bash
+cd frontend
+
+# 安装 Capacitor 依赖
+npm install @capacitor/core @capacitor/cli @capacitor/android
+
+# 初始化 Capacitor
+npx cap init "漫剧生成器" com.comicgenerator.app --web-dir dist
+
+# 添加 Android 平台
+npx cap add android
+
+# 构建前端并同步到 Android
+npm run build
+npx cap sync android
+
+# 构建 APK（需要 Android SDK）
+cd android
+./gradlew assembleRelease
+```
+
+APK 输出：`android/app/build/outputs/apk/release/app-release-unsigned.apk`
+
+### 🍎 iOS 端
+
+使用 **Capacitor** 构建 iOS 应用（需要 macOS 和 Xcode）：
+
+```bash
+cd frontend
+
+# 安装 Capacitor iOS 依赖
+npm install @capacitor/ios
+
+# 添加 iOS 平台
+npx cap add ios
+
+# 构建前端并同步到 iOS
+npm run build
+npx cap sync ios
+
+# 使用 Xcode 打开项目
+npx cap open ios
+
+# 或在命令行构建
+xcodebuild -workspace ios/App/App.xcworkspace -scheme App -configuration Release
+```
+
+### 🚀 一键构建所有平台
+
+使用提供的构建脚本：
+
+```bash
+# 给脚本添加执行权限
+chmod +x build-all.sh
+
+# 构建所有平台
+./build-all.sh
+
+# 或单独构建特定平台
+./build-all.sh --pc       # 只构建 PC 端
+./build-all.sh --android  # 只构建 Android 端
+./build-all.sh --ios      # 只构建 iOS 端
+./build-all.sh --help     # 查看帮助
+```
+
+### 📦 项目结构（多平台）
+
+```
+comic-generator/
+├── backend/              # 后端服务
+├── frontend/
+│   ├── src/             # React 源码
+│   ├── electron/        # 🆕 Electron 主进程
+│   │   ├── main.js      # 主进程入口
+│   │   └── preload.js   # 预加载脚本
+│   ├── android/         # 🆕 Android 项目（Capacitor 生成）
+│   ├── ios/             # 🆕 iOS 项目（Capacitor 生成）
+│   ├── dist/            # Web 构建输出
+│   └── dist-electron/   # PC 端构建输出
+├── build-all.sh         # 🆕 全平台构建脚本
+└── README.md
+```
+
+### ⚠️ 注意事项
+
+1. **Android 构建**：需要安装 Android Studio 并配置 `ANDROID_SDK_ROOT` 环境变量
+2. **iOS 构建**：必须在 macOS 系统上，且需要安装 Xcode
+3. **签名配置**：
+   - Android：在 `frontend/android/app/build.gradle` 中配置签名密钥
+   - iOS：在 Xcode 中配置开发者证书和 Provisioning Profile
+4. **后端服务**：移动端应用需要配置后端 API 地址，建议部署到云服务器
+
 ## 📄 License
 
 MIT
